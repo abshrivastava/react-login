@@ -1,85 +1,108 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './App.css';
 import axios from 'axios';
 
+//stateless component for Dashboard
+const Dashboard = ({userName, inlogOut}) => {
+  return(
+    <div>
+      Welcome<strong className="red-text">{userName}</strong>!!!
+      <button onClick={inlogOut}>LogOut</button>
+    </div>
+  )
+}
 
-class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      hasLogin:false,
-      user: {
-        username:null,
-        password:null
+//Parent Class
+class App extends React.Component {
+  constructor(props){
+    super(props) 
+      this.state = {
+        islogIn: false,
+        isError: false,
+        uesrInfo: {
+          username: null,
+          password: null
+        }
       }
     }
-  }
 
-  componentDidMount() {
-    axios.get(`http://dummy.restapiexample.com/api/v1/employee/16300`)
-      .then(res => {
-        const fetchUser = res.data
-        this.setState({
-          user: {
-            username:fetchUser.employee_name,
-            password:fetchUser.id
-          }
-        })
-        console.log("this.state", fetchUser)
-      })
+//API call
+componentDidMount() {
+  axios.get(`http://dummy.restapiexample.com/api/v1/employee/16300`)
+  .then(response => {
+    let userdata = response.data
+    this.setState({
+     uesrInfo: {
+        userName: userdata.employee_name,
+        userPass: userdata.employee_salary
+      }
+    })
+  })
+}
+
+//Login data getting from childreen
+signIn= (userName, userPass) => {
+  if((this.state.uesrInfo.userName === userName) && (this.state.uesrInfo.userPass === userPass)) {
+    this.setState({
+      islogIn: true,
+      isError: false
+    })
+    console.log("Success")
+  } else {
+    this.setState({
+      isError: true
+    })
+    console.log("Reject")
   }
-  
-  signIn = (username, password) => {
-    if (username === this.state.user.username && password === this.state.user.password) {
-      this.setState({hasLogin:true})
-    } 
-    console.log("this.state>>>>>>>",this.state)
-  }
-  
-  render() {
-    return (
+}
+
+//logout section
+logOut= () => {
+  this.setState({
+    islogIn: false
+  })
+}
+
+render() {
+  return(
       <div>
-        <h1>My Application</h1>
         {
-          (this.state.hasLogin) ?
-            <Welcome />
-            :
-            <LoginForm onSignIn= {this.signIn} />
+          (this.state.islogIn) ?
+          <Dashboard inlogOut= {this.logOut} userName= {this.state.uesrInfo.userName} />
+          :
+          <Login insignIn={this.signIn} isError= {this.state.isError} />
         }
       </div>
-    ) 
-  }
-}
-
-class LoginForm extends Component {
-  handleSignIn = (e) => {
-    e.preventDefault()
-    let username = this.refs.username.value
-    let password = this.refs.password.value
-    this.props.onSignIn(username, password)
-  }
-  render() {
-    return(
-      <form onSubmit={this.handleSignIn}>
-      <h3>Sign in</h3>
-        <div className="red-text">Username password is wrong</div>
-      <input type="text" ref="username" placeholder="enter you username" />
-      <input type="password" ref="password" placeholder="enter password" />
-      <input type="submit" value="Login" />
-    </form>
     )
   }
 }
 
-class Welcome extends Component {
+//Login Page
+class Login extends React.Component {
+  submission = (e) => {
+    e.preventDefault()
+    let userName = this.refs.name_info.value
+    let userPass = this.refs.password.value
+    this.props.insignIn(userName, userPass)
+  }
   render() {
     return(
       <div>
-        Welcome!!!
+
+        <div onSubmit={this.submission}>
+        <form>
+        {
+          this.props.isError &&
+          <div className="red-text">Please Fill Correct User Name And Password</div>  
+        }
+          <input type="text" placeholder="Please Insert Your Name" ref="name_info" /><br />
+          <input type="text" placeholder="Please Insert Your Password" ref="password" /><br />
+          <button type="submit">LogIn</button>
+        </form>
+        </div>
       </div>
     )
   }
-
 }
 
-export default App;
+export default App
