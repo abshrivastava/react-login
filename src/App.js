@@ -1,108 +1,125 @@
 import React from 'react';
 import './App.css';
-import axios from 'axios';
-
-//stateless component for Dashboard
-const Dashboard = ({userName, inlogOut}) => {
-  return(
-    <div>
-      Welcome<strong className="red-text">{userName}</strong>!!!
-      <button onClick={inlogOut}>LogOut</button>
-    </div>
-  )
-}
 
 //Parent Class
 class App extends React.Component {
   constructor(props){
     super(props) 
-      this.state = {
-        islogIn: false,
-        isError: false,
-        uesrInfo: {
-          username: null,
-          password: null
-        }
+      this.state= {
+        EmpName: "Abhishek"
       }
     }
-
-//API call
-componentDidMount() {
-  axios.get(`http://dummy.restapiexample.com/api/v1/employee/16300`)
-  .then(response => {
-    let userdata = response.data
-    this.setState({
-     uesrInfo: {
-        userName: userdata.employee_name,
-        userPass: userdata.employee_salary
-      }
-    })
-  })
-}
-
-//Login data getting from childreen
-signIn= (userName, userPass) => {
-  if((this.state.uesrInfo.userName === userName) && (this.state.uesrInfo.userPass === userPass)) {
-    this.setState({
-      islogIn: true,
-      isError: false
-    })
-    console.log("Success")
-  } else {
-    this.setState({
-      isError: true
-    })
-    console.log("Reject")
-  }
-}
-
-//logout section
-logOut= () => {
+submitData= (e) => {
+  e.preventDefault()
   this.setState({
-    islogIn: false
+    EmpName: this.refs.userName.value
   })
 }
+
+// userList = (userName) => {
+//   this.setState({
+//     EmpName: this.state
+//   })
+//   console.log("userName>>", userName)
+
+// }
 
 render() {
   return(
       <div>
-        {
-          (this.state.islogIn) ?
-          <Dashboard inlogOut= {this.logOut} userName= {this.state.uesrInfo.userName} />
-          :
-          <Login insignIn={this.signIn} isError= {this.state.isError} />
-        }
+        <form onSubmit={this.submitData}>
+          <input type="text" ref="userName" width="230" />
+          <button type="submit">Submit Detail</button>
+        </form>
+        <Dashboard EmpName= {this.state.EmpName} userData= {this.userList} />
       </div>
     )
   }
 }
 
-//Login Page
-class Login extends React.Component {
-  submission = (e) => {
-    e.preventDefault()
-    let userName = this.refs.name_info.value
-    let userPass = this.refs.password.value
-    this.props.insignIn(userName, userPass)
+// Dashboard child component
+class Dashboard extends React.Component {
+
+  deleteItem= () => {
+    console.log("Deleted items>>")
   }
   render() {
     return(
       <div>
-
-        <div onSubmit={this.submission}>
-        <form>
-        {
-          this.props.isError &&
-          <div className="red-text">Please Fill Correct User Name And Password</div>  
-        }
-          <input type="text" placeholder="Please Insert Your Name" ref="name_info" /><br />
-          <input type="text" placeholder="Please Insert Your Password" ref="password" /><br />
-          <button type="submit">LogIn</button>
-        </form>
-        </div>
+        <ul>
+            <li>{this.props.EmpName}<button onClick= {this.deleteItem}>Delete</button></li>
+        </ul>
       </div>
     )
   }
 }
 
 export default App
+
+
+
+
+
+
+// class Todos extends React.Component {
+//   constructor(props) {
+//       super(props);
+//       this.state = { todos: [], text: '' };
+//       this.removeTodo = this.removeTodo.bind(this);
+//   }
+
+//   addTodo(e) {
+//       e.preventDefault();
+//       this.setState({ 
+//         todos: [ this.state.text, ...this.state.todos ],
+//         text: ''
+//       });
+//   }
+
+//   removeTodo(name, i){
+//       let todos = this.state.todos.slice();
+//       todos.splice(i, 1);
+//       this.setState({
+//           todos
+//       });
+//   }
+
+//   updateValue(e) {
+//       this.setState({ text: e.target.value})
+//   }
+
+//   render() {
+//       return(
+//           <div>
+//               <form onSubmit = {(e) => this.addTodo(e)}>
+//                   <input
+//                       placeholder="Add Todo"
+//                       value={this.state.text}
+//                       onChange={(e) => {this.updateValue(e)}}
+//                   />
+//                   <button type="submit">Add Todo</button>
+//               </form>
+//               <TodoList todos={this.state.todos} removeTodo={this.removeTodo}/>
+//           </div>
+//       );
+//   }
+// }
+
+// class TodoList extends React.Component {
+
+//   removeItem(item, i) {
+//       this.props.removeTodo(item, i);
+//   }
+
+//   render() {
+//       return(
+//           <ul>
+//               { this.props.todos.map((todo,i) => {
+//                   return <li onClick={() => { this.removeItem(todo, i)}} key={i}>{ todo }</li>
+//               })}
+//           </ul>
+//       );
+//   }
+// }
+
+// ReactDOM.render(<Todos/>, document.getElementById('app'))
