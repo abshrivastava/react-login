@@ -21,6 +21,10 @@ submitData= (e) => {
 deleteUser = (userData) => {
   console.log("userData",userData)
   this.state.EmpName.splice(userData-1,userData)
+  this.setState({
+    EmpName: [...this.state.EmpName]
+  })
+
 }
 
 render() {
@@ -41,7 +45,6 @@ render() {
 class Dashboard extends React.Component {
   constructor(props) {
     super(props)
-    this.deleteItem = this.deleteItem.bind(this);
   }
   deleteItem=(data) => {
     console.log("Deleted items>>",data)
